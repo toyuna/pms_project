@@ -1,0 +1,10 @@
+# 설정
+driver=oracle.jdbc.driver.OracleDriver
+url=jdbc:oracle:thin:@49.238.170.24:1521:xe
+user=yoon
+pass=0220
+# 업로드할 파일 경로 설정
+upload=C:/Develop/upload/
+#photoupload=c:/Develop/photo/
+photoupload=C:/Develop/2. workspace/comminity/pms/pms_svn/src/main/webapp/a01_img/
+

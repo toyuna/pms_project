@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="pms.a01_mvc.a03_dao.OutputDao">
+
+	<select id="totCnt"  parameterType="boardSch" resultType="int">
+			select count(*)
+			from output
+			where 1=1
+			<if test="writer!=null and writer!=''"> 
+			and writer like '%'||#{sch}||'%'
+			</if> 
+			<if test="title!=null and title!=''"> 
+			and output_title like '%'||#{sch}||'%'
+			</if>		
+	</select>
+	
+	<!-- public List<Output> getOutputList(BoardSch sch);  	-->
+	<select id="getOutputList" parameterType="boardSch" resultType="output">
+		select *
+		from (
+			select rownum cnt, level, o.* 
+			from output o
+			where 1=1
+			<!--  mybatis에서 null 아니고 ''공백이 아닐 때  -->
+			<if test="skind!=null and skind=='작성자'"> 
+			and writer like '%'||#{sch}||'%'
+			</if> 
+			<if test="skind!=null and skind=='제목'"> 
+			and output_title like '%'||#{sch}||'%'
+			</if>
+			START WITH output_refno=0
+			CONNECT BY PRIOR output_list_num=output_refno
+			ORDER siblings BY output_list_num desc )
+			where cnt between #{start} and #{end}
+	</select>
+
+	<insert id="insertOutput" parameterType="output">
+		INSERT INTO output
+		VALUES(output_seq.nextval,
+				#{output_refno},
+				#{output_title},
+				#{output_content},
+				#{project_name},
+				#{dname},
+				#{writer},
+				sysdate,
+				sysdate,
+				0)
+	</insert>
+	
+	<insert id="insertFileInfo" parameterType="fileInfo">
+		INSERT INTO fileInfo
+		 values(output_seq.currval,
+		  		#{pathinfo},
+				#{fname},
+				sysdate,
+				sysdate,
+				#{etc})	
+	</insert>
+
+
+	<!-- 
+	public Output getOutput(int output_list_num);
+	public ArrayList<String> getFileInfo(int fno);
+	 -->
+	<select id="getOutput" parameterType="int" resultType="output">
+		select *
+		from output
+		where output_list_num = #{output_list_num}
+		ORDER BY output_list_num asc
+	</select>
+	
+	<select id="getFileInfo" parameterType="int" resultType="string">
+		select fname
+		from fileInfo
+		where fno = #{fno}
+	</select>	
+	
+	<delete id="delOutput" parameterType="int">
+		delete 
+		from output
+		where output_list_num=#{output_list_num}
+	</delete>
+	
+	
+	<update id = "uptOutput" parameterType="output">
+		update output
+		   set output_title = #{output_title},
+			   output_content = #{output_content},
+			   output_upt = sysdate
+		 where output_list_num = #{output_list_num}	
+	</update>
+	
+	<update id="updateReadCnt" parameterType="int">
+		update output
+			set readcnt = readcnt+1
+		where output_list_num = #{output_list_num}
+	</update>	 
+
+	
+</mapper>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="pms.a01_mvc.a03_dao.MemberDao">
+	<!-- 회원 정보 SQL -->
+	<select id="getMemberList" resultType="member" parameterType="member">
+		select *
+		from pmsmember
+		where name like '%' || #{name} || '%'
+		ORDER BY MEM_NUM asc
+	</select>
+	
+	<!-- 회원 상세 정보 SQL -->
+	<select id="getMemnum" parameterType="int" resultType="member">
+		select *
+		from pmsmember
+		where mem_num=#{mem_num}
+	</select> 
+	
+	<!-- 회원 정보 업데이트 SQL -->
+	<update id = "uptMem" parameterType="member">
+		update pmsmember
+		   set id = #{id},
+			   pass = #{pass},
+			   name = #{name},
+			   dname = #{dname},
+			   email = #{email},
+			   phone = #{phone},
+			   auth = #{auth}
+		 where mem_num = #{mem_num}	
+	</update>
+	
+	<!-- 회원 정보 삭제 SQL -->
+	<delete id="delMem" parameterType="int">
+		delete 
+		from pmsmember
+		where mem_num=#{mem_num}
+	</delete>
+	
+	<!-- 회원 정보 등록 SQL -->
+	<insert id="insertMem" parameterType="member">
+		INSERT INTO pmsmember
+		VALUES(mem_seq.nextval,#{id},#{pass},#{name},#{dname},#{email},#{phone},#{auth},#{photo,jdbcType=VARCHAR})
+	</insert>
+	
+
+	
+</mapper>

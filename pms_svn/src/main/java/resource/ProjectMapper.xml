@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="pms.a01_mvc.a03_dao.ProjectDao">
+	
+	<select id="totCnt"  parameterType="boardSch" resultType="int">
+			select count(*)
+			from project 
+			where 1=1
+			<if test="skind!=null and skind=='작성자'"> 
+			and writer like '%'||#{sch}||'%'
+			</if> 
+			<if test="skind!=null and skind=='제목'"> 
+			and project_title like '%'||#{sch}||'%'
+			</if>		
+	</select>
+	
+	<!-- public List<Project> getProjectList(BoardSch sch); -->
+	<select id="getProjectList" parameterType="boardSch" resultType="project">
+		select *
+		from (
+			select rownum cnt, level, p.* 
+			from project p
+			where 1=1
+			<!-- mybatis에서 null 아니고 ''공백이 아닐 때 -->
+			<if test="skind!=null and skind=='작성자'"> 
+			and writer like '%'||#{sch}||'%'
+			</if> 
+			<if test="skind!=null and skind=='제목'"> 
+			and project_title like '%'||#{sch}||'%'
+			</if>
+			START WITH project_refno=0
+			CONNECT BY PRIOR project_list_num=project_refno
+			ORDER siblings BY project_list_num desc )
+		where cnt between #{start} and #{end}
+	</select>
+	
+	<insert id="insertProject" parameterType="project">
+		INSERT INTO project
+		VALUES(pj_seq.nextval,
+				#{project_refno, jdbcType=VARCHAR},
+				#{project_title, jdbcType=VARCHAR},
+				#{writer,jdbcType=VARCHAR},
+				#{dname,jdbcType=VARCHAR},
+				to_date(#{project_startS},'YYYY-MM-DD'),
+				to_date(#{project_endS},'YYYY-MM-DD'),
+				#{project_budget, jdbcType=VARCHAR},
+				#{project_manager, jdbcType=VARCHAR},
+				#{project_member, jdbcType=VARCHAR},
+				0
+				)
+	</insert>
+	
+	<insert id="insertFileInfo" parameterType="fileInfo">
+		INSERT INTO fileInfo
+		 values(pj_seq.currval,
+		  		#{pathinfo},
+				#{fname},
+				sysdate,
+				sysdate,
+				#{etc})	
+	</insert>
+
+
+	<!-- 
+	public Project getProject(int project_list_num);
+	public ArrayList<String> getFileInfo(int fno);
+	 -->
+	<select id="getProject" parameterType="int" resultType="project">
+		select *
+		from project
+		where project_list_num = #{project_list_num}
+		ORDER BY project_list_num asc
+	</select>
+	
+	<select id="getFileInfo" parameterType="int" resultType="string">
+		select fname
+		from fileInfo
+		where fno = #{fno}
+	</select>	
+	
+	<delete id="delProject" parameterType="int">
+		delete 
+		from project
+		where project_list_num=#{project_list_num}
+	</delete>
+	
+	
+	<update id = "uptProject" parameterType="project">
+		update project
+		   set project_title = #{project_title},
+			   project_budget = #{project_budget},
+			   project_start = to_date(#{project_startS},'YYYY-MM-DD'),
+			   project_end = to_date(#{project_endS},'YYYY-MM-DD'),
+			   project_manager = #{project_manager}
+		 where project_list_num = #{project_list_num}	
+	</update>
+	
+	<update id="updateReadCnt" parameterType="int">
+		update project
+			set readcnt = readcnt+1
+		where project_list_num = #{project_list_num}
+	</update>
+	
+	<!-- public ArrayList<Project> getProjectList2(); -->
+	<select id="getProjectList2" resultType="project">
+		select *
+		from project
+	</select>	
+
+	
+</mapper>

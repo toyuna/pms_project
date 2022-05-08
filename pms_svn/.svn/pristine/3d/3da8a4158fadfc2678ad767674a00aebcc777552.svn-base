@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="pms.a01_mvc.a03_dao.MeetingDao">
+
+	<select id="totCnt"  parameterType="boardSch" resultType="int">
+			select count(*)
+			from meeting
+			where 1=1
+			<if test="skind!=null and skind=='작성자'"> 
+			and writer like '%'||#{sch}||'%'
+			</if> 
+			<if test="skind!=null and skind=='제목'"> 
+			and meeting_title like '%'||#{sch}||'%'
+			</if>		
+	</select>
+	
+	<!-- public List<Meeting> getMeetingList(BoardSch sch);  	-->
+	<select id="getMeetingList" parameterType="boardSch" resultType="meeting">
+		select *
+		from (
+			select rownum cnt, level, m.* 
+			from meeting m
+			where 1=1
+			<!--  mybatis에서 null 아니고 ''공백이 아닐 때  -->
+			<if test="skind!=null and skind=='작성자'"> 
+			and writer like '%'||#{sch}||'%'
+			</if> 
+			<if test="skind!=null and skind=='제목'"> 
+			and meeting_title like '%'||#{sch}||'%'
+			</if>		
+			START WITH meeting_refno=0
+			CONNECT BY PRIOR meeting_list_num=meeting_refno
+			ORDER siblings BY meeting_list_num desc )
+			where cnt between #{start} and #{end}
+	</select>
+
+	<insert id="insertMeeting" parameterType="meeting">
+		INSERT INTO meeting
+		VALUES(meeting_seq.nextval,
+				#{meeting_refno},
+				#{meeting_title},
+				#{meeting_content},
+				#{project_name},
+				#{dname},
+				#{writer},
+				sysdate,
+				sysdate,
+				0)
+	</insert>
+	
+	<insert id="insertFileInfo" parameterType="fileInfo">
+		INSERT INTO fileInfo
+		 values(meeting_seq.currval,
+		  		#{pathinfo},
+				#{fname},
+				sysdate,
+				sysdate,
+				#{etc})	
+	</insert>
+
+
+	<!-- 
+	public Meeting getMeeting(int meeting_list_num);
+	public ArrayList<String> getFileInfo(int fno);
+	 -->
+	<select id="getMeeting" parameterType="int" resultType="meeting">
+		select *
+		from meeting
+		where meeting_list_num = #{meeting_list_num}
+		ORDER BY meeting_list_num asc
+	</select>
+	
+	<select id="getFileInfo" parameterType="int" resultType="string">
+		select fname
+		from fileInfo
+		where fno = #{fno}
+	</select>	
+	
+	<delete id="delMeeting" parameterType="int">
+		delete 
+		from meeting
+		where meeting_list_num=#{meeting_list_num}
+	</delete>
+	
+	
+	<update id = "uptMeeting" parameterType="meeting">
+		update meeting
+		   set meeting_title = #{meeting_title},
+			   meeting_content = #{meeting_content},
+			   meeting_upt = sysdate
+		 where meeting_list_num = #{meeting_list_num}	
+	</update>
+	
+	<update id="updateReadCnt" parameterType="int">
+		update meeting
+			set readcnt = readcnt+1
+		where meeting_list_num = #{meeting_list_num}
+	</update>	 
+
+	
+</mapper>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="pms.a01_mvc.a03_dao.NoticeDao">
+
+	<select id="totCnt"  parameterType="boardSch" resultType="int">
+			select count(*)
+			from notice
+			where 1=1
+			<if test="skind!=null and skind=='작성자'"> 
+			and writer like '%'||#{sch}||'%'
+			</if> 
+			<if test="skind!=null and skind=='제목'"> 
+			and notice_title like '%'||#{sch}||'%'
+			</if>		
+	</select>
+	
+	<!--  public List<Notice> getNoticeList(BoardSch sch);  	-->
+	<select id="getNoticeList" parameterType="boardSch" resultType="notice">
+		select *
+		from (
+			select rownum cnt, level, n.* 
+			from notice n
+			where 1=1
+				<!--  mybatis에서 null 아니고 ''공백이 아닐 때  -->
+			<if test="skind!=null and skind=='작성자'"> 
+			and writer like '%'||#{sch}||'%'
+			</if> 
+			<if test="skind!=null and skind=='제목'"> 
+			and notice_title like '%'||#{sch}||'%'
+			</if>
+			START WITH notice_refno=0
+			CONNECT BY PRIOR notice_list_num=notice_refno
+			ORDER siblings BY notice_list_num desc )
+			where cnt between #{start} and #{end}
+	</select>
+
+	<insert id="insertNotice" parameterType="notice">
+		INSERT INTO notice
+		VALUES(notice_seq.nextval,
+				#{notice_refno},
+				#{notice_title},
+				#{notice_content},
+				#{project_name},
+				#{dname},
+				#{writer},
+				sysdate,
+				sysdate,
+				0)
+	</insert>
+	
+	<insert id="insertFileInfo" parameterType="fileInfo">
+		INSERT INTO fileInfo
+		 values(notice_seq.currval,
+		  		#{pathinfo},
+				#{fname},
+				sysdate,
+				sysdate,
+				#{etc})	
+	</insert>
+
+
+	<!-- 
+	public Notice getNotice(int notice_list_num);
+	public ArrayList<String> getFileInfo(int fno);
+	 -->
+	<select id="getNotice" parameterType="int" resultType="notice">
+		select *
+		from notice
+		where notice_list_num = #{notice_list_num}
+		ORDER BY notice_list_num asc
+	</select>
+	
+	<select id="getFileInfo" parameterType="int" resultType="string">
+		select fname
+		from fileInfo
+		where fno = #{fno}
+	</select>	
+	
+	<delete id="delNotice" parameterType="int">
+		delete 
+		from notice
+		where notice_list_num=#{notice_list_num}
+	</delete>
+	
+	
+	<update id = "uptNotice" parameterType="notice">
+		update notice
+		   set notice_title = #{notice_title},
+			   notice_content = #{notice_content},
+			   notice_upt = sysdate
+		 where notice_list_num = #{notice_list_num}	
+	</update>
+	
+	<update id="updateReadCnt" parameterType="int">
+		update notice
+			set readcnt = readcnt+1
+		where notice_list_num = #{notice_list_num}
+	</update>	 
+
+	
+</mapper>

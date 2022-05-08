@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias alias="member" type="pms.a02_vo.PmsMember"/>
+		<typeAlias alias="calendar" type="pms.a02_vo.Calendar"/>
+		<typeAlias alias="file" type="pms.a02_vo.FileVo"/> 
+		<typeAlias alias="fileInfo" type="pms.a02_vo.FileInfo"/> 
+		<typeAlias alias="gantt" type="pms.a02_vo.Gantt"/>
+		<typeAlias alias="link" type="pms.a02_vo.Link"/>
+		<typeAlias alias="myjob" type="pms.a02_vo.Myjob"/>
+		<typeAlias alias="project" type="pms.a02_vo.Project"/>
+		<typeAlias alias="notice" type="pms.a02_vo.Notice"/>
+		<typeAlias alias="boardSch" type="pms.a02_vo.BoardSch"/>
+		<typeAlias alias="meeting" type="pms.a02_vo.Meeting"/>
+		<typeAlias alias="working" type="pms.a02_vo.Working"/>
+		<typeAlias alias="output" type="pms.a02_vo.Output"/>
+		<typeAlias alias="dashpro" type="pms.a02_vo.Dashboard"/>
+	</typeAliases>
+	<mappers>
+		<mapper resource="resource/MemberMapper.xml"/>
+		<mapper resource="resource/LoginMapper.xml"/>
+		<mapper resource="resource/MainMapper.xml"/>
+		<mapper resource="resource/CalendarMapper.xml"/>
+		<mapper resource="resource/FileMapper.xml"/>
+		<mapper resource="resource/MyjobMapper.xml"/>
+		<mapper resource="resource/ProjectMapper.xml"/>
+		<mapper resource="resource/NoticeMapper.xml"/>
+		<mapper resource="resource/MeetingMapper.xml"/>
+		<mapper resource="resource/WorkingMapper.xml"/>
+		<mapper resource="resource/OutputMapper.xml"/>
+		<mapper resource="resource/GanttMapper.xml"/>
+		<mapper resource="resource/DashboardMapper.xml"/>
+	</mappers>
+
+</configuration>

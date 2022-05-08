@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="pms.a01_mvc.a03_dao.MyjobDao">
+	<!-- 내업무 목록 -->
+	<select id="totCnt"  parameterType="boardSch" resultType="int">
+			select count(*)
+			from myjob 
+			where 1=1
+			<if test="writer!=null and writer!=''"> 
+			and writer like '%'||#{writer}||'%'
+			</if> 
+			<if test="title!=null and title!=''"> 
+			and title like '%'||#{myjob_title}||'%'
+			</if>		
+	</select>
+	
+	
+	<select id="getMyjobList" parameterType="boardSch" resultType="myjob">
+		select *
+		from (
+			select rownum cnt, level, m.* 
+			from myjob m
+			where 1=1
+			<if test="writer!=null and writer!=''"> 
+			and writer like '%'||#{writer}||'%'
+			</if> 
+			<if test="title!=null and title!=''"> 
+			and myjob_title like '%'||#{myjob_title}||'%'
+			</if>
+			START WITH myjob_refno=0
+			CONNECT BY PRIOR myjob_list_num=myjob_refno
+			ORDER siblings BY myjob_list_num desc )
+		where cnt between #{start} and #{end}
+	</select>
+	
+	<insert id="insertMyjob" parameterType="myjob">
+		INSERT INTO myjob
+		VALUES(mj_seq.nextval,
+				#{myjob_refno, jdbcType=VARCHAR},
+				#{myjob_title, jdbcType=VARCHAR},
+				#{writer,jdbcType=VARCHAR},
+				#{dname,jdbcType=VARCHAR},
+				#{myjob_content,jdbcType=VARCHAR},
+				#{project_name,jdbcType=VARCHAR},
+				#{mname,jdbcType=VARCHAR},
+				sysdate,
+				sysdate,
+				0
+				)
+	</insert>
+	
+	<insert id="insertFileInfo" parameterType="fileInfo">
+		INSERT INTO fileInfo
+		 values(mj_seq.currval,
+		  		#{pathinfo},
+				#{fname},
+				sysdate,
+				sysdate,
+				#{etc})	
+	</insert>
+
+
+	<!-- 
+	public Project getProject(int project_list_num);
+	public ArrayList<String> getFileInfo(int fno);
+	 -->
+	<select id="getMyjob" parameterType="int" resultType="myjob">
+		select *
+		from myjob
+		where myjob_list_num = #{myjob_list_num}
+		ORDER BY myjob_list_num asc
+	</select>
+	
+	<select id="getFileInfo" parameterType="int" resultType="string">
+		select fname
+		from fileInfo
+		where fno = #{fno}
+	</select>	
+	
+	<delete id="delMyjob" parameterType="int">
+		delete 
+		from myjob
+		where myjob_list_num=#{myjob_list_num}
+	</delete>
+	
+	
+	<update id = "uptMyjob" parameterType="myjob">
+		update myjob
+		   set myjob_title = #{myjob_title},
+			   myjob_content = #{myjob_content},
+			   myjob_upt = sysdate,
+			   mname = #{mname}
+		 where myjob_list_num = #{myjob_list_num}	
+	</update>
+	
+	<update id="updateReadCnt" parameterType="int">
+		update myjob
+			set readcnt = readcnt+1
+		where myjob_list_num = #{myjob_list_num}
+	</update>	
+	
+	
+	<select id="getMyjobList2" resultType="myjob">
+		select *
+		from myjob
+		<!-- where mname like '%'||#{member.name}||'%' -->
+	</select>
+	
+</mapper>

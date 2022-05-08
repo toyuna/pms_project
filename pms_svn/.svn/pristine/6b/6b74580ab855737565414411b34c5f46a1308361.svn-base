@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="pms.a01_mvc.a03_dao.MainDao">
+
+	<!--
+	마이페이지dao 연결 
+	public PmsMember mypage(PmsMember mypage);
+	 -->
+	<select id="mypage" parameterType="member" resultType="member">
+		select * 
+		from pmsmember
+		where mem_num = #{mem_num}
+	</select>
+	
+	<!-- 
+	마이페이지 수정 
+	public void updateMember(PmsMember upt);
+	 -->
+	<update id="updateMember" parameterType="member">
+		update pmsmember
+			set id = #{id},
+				pass = #{pass},
+				name = #{name},
+				email = #{email},
+				phone = #{phone}
+				<if test="photo!=null and photo!=''"> 
+				,photo = #{photo}
+				</if>
+		where mem_num = #{mem_num}
+	</update>
+	
+
+	
+</mapper>

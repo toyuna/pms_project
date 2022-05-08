@@ -1,0 +1,11 @@
+@charset "UTF-8";
+
+ body {
+        background: #f8f8f8;
+        padding: 300px 0;
+        
+    }
+    
+    #login-form > div {
+        margin: 15px auto;
+    }

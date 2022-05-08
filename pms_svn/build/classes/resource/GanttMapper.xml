@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="pms.a01_mvc.a03_dao.GanttDao">
+	<!-- 
+	public List<Gantt> getGanttList();
+	 -->
+	<resultMap type="gantt" id="ganttResult">
+		<result property="open" column="open1"/>
+	</resultMap> 	
+	<!-- 
+	public ArrayList<Gantt> getGantt(int project_id);
+	 -->
+	<select id="getGantt" resultMap="ganttResult" parameterType="int">
+		select project_num,id, start_date, duration, text, progress, sortorder, parent, open1
+		from gantt
+		where project_num = #{project_num}
+	</select>
+	
+	<!-- 
+		public void insertGantt(Gantt insert);
+	public void updateGantt(Gantt update);
+	public void deleteGantt(Gantt delete);
+
+	public void insertLink(Link insert);
+	public void updateLink(Link update);
+	public void deleteLink(Link del);
+	
+	SELECT project_num, id,  source1, target, type1 FROM link;
+	 -->
+	<insert id="insertGantt" parameterType="gantt">
+		insert into gantt
+		values(
+			#{project_num},
+			#{id},
+			#{start_date},
+			#{duration},
+			#{text},
+			#{progress},
+			#{sortorder},
+			#{parent},
+			#{open}
+			)
+	</insert>	 
+	<insert id="insertLink" parameterType="link">
+		insert into link 
+		values(
+			#{project_num},
+			#{id},
+			#{source},
+			#{target},
+			#{type}
+			)
+	</insert>	
+	<update id="updateGantt" parameterType="gantt">
+		 update gantt 
+			set start_date=#{start_date},
+				duration=#{duration},
+				text = #{text},
+				progress = #{progress},
+				sortorder = #{sortorder},
+				parent = #{parent},
+				open1 = #{open}
+		  where project_num = #{project_num}
+			and id = #{id}	
+	</update>	 
+	<update id="updateLink" parameterType="link">
+		update link 
+			set source1 = #{source},
+			    target = #{target},
+			    type1 = #{type}
+		  where project_num = #{project_num}
+			and id = #{id}	    
+	</update>		
+	<delete id="deleteGantt" parameterType="gantt">
+		delete gantt 
+		  where project_num = #{project_num}
+			and id = #{id}	
+	</delete>	 
+	<delete id="deleteLink" parameterType="link">
+		delete link 
+		  where project_num = #{project_num}
+			and id = #{id}
+	</delete>		
+	<resultMap type="link" id="linkResult">
+		<result property="type" column="type1"/>
+		<result property="source" column="source1"/>
+	</resultMap> 	 
+	<select id="getLink" resultMap="linkResult" parameterType="int">
+		select *
+		from link
+		where project_num = #{project_num}
+	</select>
+</mapper>
